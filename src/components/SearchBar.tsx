@@ -6,6 +6,8 @@ import {
   Popper,
   Paper,
   ClickAwayListener,
+  Typography,
+  Button,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import FilterOptions from "../FilterOptions";
@@ -106,6 +108,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
     setDropdownOpen(false);
   };
 
+  // Function to handle clicking on the "Search for [term]" button
+  const handleSearchForTerm = () => {
+    setDropdownOpen(false);
+    if (!autoRefresh) {
+      refreshResults();
+    }
+  };
+
   const hasFiltersToShow =
     filteredTopics.length > 0 || filteredCountries.length > 0;
 
@@ -142,7 +152,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         {/* Dropdown filter options */}
         {useDropdownFilters &&
           dropdownOpen &&
-          (hasFiltersToShow || popularSearches.length > 0) && (
+          (hasFiltersToShow || popularSearches.length > 0 || searchTerm) && (
             <Popper
               open={true}
               anchorEl={searchRef.current}
@@ -173,11 +183,29 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     onFilterSelect={handleFilterSelect}
                   />
                 )}
-                {/* Popular searches display */}
-                <PopularSearches
-                  searches={popularSearches}
-                  onClick={handlePopularSearch}
-                />
+
+                {/* Show "Search for [term]" when there's a search term */}
+                {searchTerm ? (
+                  <Box sx={{ mt: hasFiltersToShow ? 2 : 0, mb: 1 }}>
+                    <Button
+                      fullWidth
+                      onClick={handleSearchForTerm}
+                      sx={{
+                        justifyContent: "flex-start",
+                        textTransform: "none",
+                        py: 1,
+                      }}
+                    >
+                      <Typography>🔎 Search for "{searchTerm}"</Typography>
+                    </Button>
+                  </Box>
+                ) : (
+                  /* Popular searches display when no search term */
+                  <PopularSearches
+                    searches={popularSearches}
+                    onClick={handlePopularSearch}
+                  />
+                )}
               </Paper>
             </Popper>
           )}
