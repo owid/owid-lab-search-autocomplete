@@ -52,6 +52,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   };
 
+  // Add key down handler for the input field
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "Escape" && dropdownOpen) {
+      setDropdownOpen(false);
+      event.preventDefault(); // Prevent other default escape behaviors
+    }
+  };
+
   const handleSearchSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     setDropdownOpen(false);
@@ -91,6 +99,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             placeholder="Search for a topic or country..."
             value={searchTerm}
             onChange={handleSearchChange}
+            onKeyDown={handleKeyDown} // Add key down handler here
             variant="outlined"
             InputProps={{
               startAdornment: (
