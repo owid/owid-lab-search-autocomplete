@@ -14,9 +14,17 @@ import {
   Card,
   CardContent,
   CardMedia,
+  Drawer,
+  IconButton,
+  AppBar,
+  Toolbar,
+  Switch,
+  FormControlLabel,
+  Divider,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import LightbulbIcon from "@mui/icons-material/Lightbulb";
+import SettingsIcon from "@mui/icons-material/Settings";
 import "./App.css";
 import { topics, countries, sampleResults } from "./data";
 
@@ -27,6 +35,8 @@ const SearchApp = () => {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [searchResults, setSearchResults] = useState<typeof sampleResults>([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(true);
 
   const theme = createTheme({
     palette: {
@@ -34,7 +44,14 @@ const SearchApp = () => {
     },
   });
 
+  const toggleDrawer = (open: boolean) => () => {
+    setDrawerOpen(open);
+  };
+
   useEffect(() => {
+    // Skip auto-refresh if the setting is turned off
+    if (!autoRefresh) return;
+
     // Simulate search results based on search term or filters
     // Shuffle and select random results
     const shuffled = [...sampleResults].sort(() => 0.5 - Math.random());
@@ -44,7 +61,18 @@ const SearchApp = () => {
     ); // 2-7 results
     setSearchResults(selectedResults);
     console.log("Search results updated", selectedResults);
-  }, [searchTerm, selectedTopics, selectedCountries]);
+  }, [searchTerm, selectedTopics, selectedCountries, autoRefresh]);
+
+  // Function to manually refresh results when auto-refresh is off
+  const refreshResults = () => {
+    const shuffled = [...sampleResults].sort(() => 0.5 - Math.random());
+    const selectedResults = shuffled.slice(
+      0,
+      Math.floor(Math.random() * 6) + 2
+    );
+    setSearchResults(selectedResults);
+    console.log("Search results manually updated", selectedResults);
+  };
 
   const shouldSuggest = searchTerm.length >= 2;
 
@@ -68,10 +96,23 @@ const SearchApp = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <AppBar position="static" color="transparent" elevation={0}>
+        <Toolbar>
+          <Box sx={{ flexGrow: 1 }} />
+          <IconButton
+            color="inherit"
+            onClick={toggleDrawer(true)}
+            aria-label="settings"
+          >
+            <SettingsIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+
       <Container
         maxWidth="md"
         sx={{
-          mt: 4,
+          mt: 2,
           width: "100%",
         }}
       >
@@ -117,6 +158,18 @@ const SearchApp = () => {
                   <SearchIcon />
                 </InputAdornment>
               ),
+              endAdornment: !autoRefresh ? (
+                <InputAdornment position="end">
+                  <IconButton
+                    edge="end"
+                    onClick={refreshResults}
+                    aria-label="refresh results"
+                    title="Refresh results"
+                  >
+                    <SearchIcon />
+                  </IconButton>
+                </InputAdornment>
+              ) : null,
             }}
             sx={{ mb: 2 }}
           />
@@ -221,6 +274,33 @@ const SearchApp = () => {
           </Box>
         </Paper>
       </Container>
+
+      {/* Settings Drawer */}
+      <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
+        <Box sx={{ width: 300, p: 3 }} role="presentation">
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Settings
+          </Typography>
+          <Divider sx={{ mb: 2 }} />
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={autoRefresh}
+                onChange={(e) => setAutoRefresh(e.target.checked)}
+                name="autoRefresh"
+                color="primary"
+              />
+            }
+            label="Auto-refresh results as you type"
+          />
+          <Typography variant="body2" sx={{ mt: 1, color: "text.secondary" }}>
+            {autoRefresh
+              ? "Results will update automatically as you type or change filters."
+              : "Results will only update when you press the search icon."}
+          </Typography>
+        </Box>
+      </Drawer>
     </ThemeProvider>
   );
 };
