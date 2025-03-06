@@ -222,7 +222,7 @@ export const countries = [
   { name: "Tristan da Cunha", flag: "🇹🇦" },
   { name: "Bouvet Island", flag: "🇧🇻" },
   { name: "South Sudan", flag: "🇸🇸" },
-  { name: "Western Sahara", flag: "🇪🇭" },
+  { name: "Western Sahara", flag: "🇪ḧ" },
   { name: "Kosovo", flag: "🇽🇰" },
   { name: "Taiwan", flag: "🇹🇼" },
   { name: "Hong Kong", flag: "🇭🇰" },
@@ -300,4 +300,11 @@ export const sampleResults = [
     subtitle: "Percentage of population vaccinated by country and disease",
     image: "https://placeholderjs.com/300x200",
   },
+];
+
+export const popularSearches = [
+  "death rate from air pollution",
+  "political regime",
+  "child mortality",
+  "carbon emissions",
 ];
