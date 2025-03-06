@@ -117,7 +117,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   const hasFiltersToShow =
-    filteredTopics.length > 0 || filteredCountries.length > 0;
+    filteredTopics.length > 0 ||
+    filteredCountries.length > 0 ||
+    selectedTopics.length > 0 ||
+    selectedCountries.length > 0;
 
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
@@ -165,7 +168,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               <Paper
                 sx={{
                   p: 2,
-                  mt: 1,
+                  mt: 0,
                   maxHeight: 300,
                   overflow: "auto",
                   bgcolor: "background.paper",
