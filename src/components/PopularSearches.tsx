@@ -10,8 +10,10 @@ const PopularSearches: React.FC<PopularSearchesProps> = ({
   onClick,
 }) => {
   return (
-    <Box sx={{ mb: 2, mt: 2 }}>
-      <Typography variant="subtitle1">Popular searches</Typography>
+    <Box sx={{ mb: 2 }}>
+      <Typography variant="subtitle1" sx={{ mb: 1 }}>
+        Popular searches
+      </Typography>
       <Box>
         {searches.map((query) => (
           <Typography

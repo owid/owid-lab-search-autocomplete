@@ -40,16 +40,35 @@ const SearchBar: React.FC<SearchBarProps> = ({
   useDropdownFilters,
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setSearchTerm(value);
+
+    // Show dropdown on text input (behavior unchanged)
     if (value.length > 0) {
       setDropdownOpen(true);
     } else {
-      setDropdownOpen(false);
+      // Only close if not focused
+      if (!isFocused) {
+        setDropdownOpen(false);
+      }
     }
+  };
+
+  const handleFocus = () => {
+    setIsFocused(true);
+    setDropdownOpen(true);
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+    // Close dropdown on blur
+    setTimeout(() => {
+      setDropdownOpen(false);
+    }, 150); // Small timeout to allow click events to fire first
   };
 
   // Add key down handler for the input field
@@ -78,6 +97,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   // Close dropdown when clicking away
   const handleClickAway = () => {
+    setIsFocused(false);
     setDropdownOpen(false);
   };
 
@@ -99,7 +119,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
             placeholder="Search for a topic or country..."
             value={searchTerm}
             onChange={handleSearchChange}
-            onKeyDown={handleKeyDown} // Add key down handler here
+            onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             variant="outlined"
             InputProps={{
               startAdornment: (
@@ -118,43 +140,47 @@ const SearchBar: React.FC<SearchBarProps> = ({
         </Box>
 
         {/* Dropdown filter options */}
-        {useDropdownFilters && dropdownOpen && hasFiltersToShow && (
-          <Popper
-            open={true}
-            anchorEl={searchRef.current}
-            placement="bottom-start"
-            style={{
-              width: searchRef.current?.clientWidth,
-              zIndex: 1301,
-            }}
-          >
-            <Paper
-              sx={{
-                p: 2,
-                mt: 1,
-                maxHeight: 300,
-                overflow: "auto",
-                bgcolor: "background.paper",
+        {useDropdownFilters &&
+          dropdownOpen &&
+          (hasFiltersToShow || popularSearches.length > 0) && (
+            <Popper
+              open={true}
+              anchorEl={searchRef.current}
+              placement="bottom-start"
+              style={{
+                width: searchRef.current?.clientWidth,
+                zIndex: 1301,
               }}
             >
-              {/* Filtered topics and countries */}
-              <FilterOptions
-                filteredTopics={filteredTopics}
-                filteredCountries={filteredCountries}
-                selectedTopics={selectedTopics}
-                selectedCountries={selectedCountries}
-                handleTopicToggle={handleTopicToggle}
-                handleCountryToggle={handleCountryToggle}
-                onFilterSelect={handleFilterSelect} // Pass the callback to close dropdown
-              />
-              {/* Popular searches display */}
-              <PopularSearches
-                searches={popularSearches}
-                onClick={handlePopularSearch}
-              />
-            </Paper>
-          </Popper>
-        )}
+              <Paper
+                sx={{
+                  p: 2,
+                  mt: 1,
+                  maxHeight: 300,
+                  overflow: "auto",
+                  bgcolor: "background.paper",
+                }}
+              >
+                {/* Filtered topics and countries */}
+                {hasFiltersToShow && (
+                  <FilterOptions
+                    filteredTopics={filteredTopics}
+                    filteredCountries={filteredCountries}
+                    selectedTopics={selectedTopics}
+                    selectedCountries={selectedCountries}
+                    handleTopicToggle={handleTopicToggle}
+                    handleCountryToggle={handleCountryToggle}
+                    onFilterSelect={handleFilterSelect}
+                  />
+                )}
+                {/* Popular searches display */}
+                <PopularSearches
+                  searches={popularSearches}
+                  onClick={handlePopularSearch}
+                />
+              </Paper>
+            </Popper>
+          )}
       </Box>
     </ClickAwayListener>
   );

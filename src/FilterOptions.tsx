@@ -56,7 +56,7 @@ const FilterOptions: React.FC<FilterOptionsProps> = ({
       )}
 
       {displayCountries && (
-        <Box>
+        <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
             Filter by country
           </Typography>
