@@ -129,6 +129,7 @@ const SearchApp = () => {
     setSelectedTopics((prev) =>
       prev.includes(topic) ? prev.filter((t) => t !== topic) : [...prev, topic]
     );
+    setSearchTerm(""); // Clear the search query
     setShowAutoFilterDropdown(false); // Close the dropdown
   };
 
@@ -138,6 +139,7 @@ const SearchApp = () => {
         ? prev.filter((c) => c !== country)
         : [...prev, country]
     );
+    setSearchTerm(""); // Clear the search query
     setShowAutoFilterDropdown(false); // Close the dropdown
   };
 
