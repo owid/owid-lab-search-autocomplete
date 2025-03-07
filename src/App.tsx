@@ -20,10 +20,17 @@ import InfoBox from "./components/InfoBox";
 import SearchBar from "./components/SearchBar";
 import SelectedFilters from "./components/SelectedFilters";
 
+// Define country type
+type Country = {
+  name: string;
+  flag: string;
+};
+
 const SearchApp = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
+  // Update to store country objects instead of just names
+  const [selectedCountries, setSelectedCountries] = useState<Country[]>([]);
   const [searchResults, setSearchResults] =
     useState<typeof sampleResults>(sampleResults);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -66,7 +73,7 @@ const SearchApp = () => {
   );
 
   // Simple filtering without prioritization
-  const filteredCountryNames = countries.filter(
+  const filteredCountries = countries.filter(
     (country) =>
       shouldSuggest &&
       country.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -79,12 +86,18 @@ const SearchApp = () => {
     setSearchTerm(""); // Clear the search query
   };
 
-  const handleCountryToggle = (country: string) => {
-    setSelectedCountries((prev) =>
-      prev.includes(country)
-        ? prev.filter((c) => c !== country)
-        : [...prev, country]
-    );
+  // Update to work with country objects
+  const handleCountryToggle = (countryToToggle: Country) => {
+    setSelectedCountries((prev) => {
+      const exists = prev.some(
+        (country) => country.name === countryToToggle.name
+      );
+      if (exists) {
+        return prev.filter((c) => c.name !== countryToToggle.name);
+      } else {
+        return [...prev, countryToToggle];
+      }
+    });
     setSearchTerm(""); // Clear the search query
   };
 
@@ -121,7 +134,7 @@ const SearchApp = () => {
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
             filteredTopics={filteredTopics}
-            filteredCountries={filteredCountryNames}
+            filteredCountries={filteredCountries}
             selectedTopics={selectedTopics}
             selectedCountries={selectedCountries}
             handleTopicToggle={handleTopicToggle}
@@ -135,7 +148,7 @@ const SearchApp = () => {
           {!useDropdownFilters && (
             <FilterOptions
               filteredTopics={filteredTopics}
-              filteredCountries={filteredCountryNames}
+              filteredCountries={filteredCountries}
               selectedTopics={selectedTopics}
               selectedCountries={selectedCountries}
               handleTopicToggle={handleTopicToggle}

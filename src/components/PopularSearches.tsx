@@ -1,35 +1,47 @@
-import { Box, Typography } from "@mui/material";
+import React from "react";
+import { Box, Typography, Button } from "@mui/material";
 
 interface PopularSearchesProps {
   searches: string[];
-  onClick: (search: string) => void;
+  onClick: (term: string) => void;
+  focusedIndex: number;
 }
 
 const PopularSearches: React.FC<PopularSearchesProps> = ({
   searches,
   onClick,
+  focusedIndex,
 }) => {
+  if (searches.length === 0) return null;
+
   return (
-    <Box sx={{ mb: 2 }}>
+    <Box>
       <Typography variant="subtitle1" sx={{ mb: 1 }}>
         Popular searches
       </Typography>
-      <Box>
-        {searches.map((query) => (
-          <Typography
-            key={query}
-            variant="body2"
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+        {searches.map((search, index) => (
+          <Button
+            key={index}
+            onClick={() => onClick(search)}
             sx={{
-              cursor: "pointer",
-              mb: 1,
+              justifyContent: "flex-start",
+              textTransform: "none",
+              py: 0.5,
+              backgroundColor:
+                focusedIndex === index ? "rgba(0, 0, 0, 0.04)" : "transparent",
               "&:hover": {
-                textDecoration: "underline",
+                backgroundColor:
+                  focusedIndex === index
+                    ? "rgba(0, 0, 0, 0.08)"
+                    : "rgba(0, 0, 0, 0.04)",
               },
+              border: focusedIndex === index ? "1px solid #bdbdbd" : "none",
+              borderRadius: 1,
             }}
-            onClick={() => onClick(query)}
           >
-            🔍 {query}
-          </Typography>
+            <Typography variant="body2">{search}</Typography>
+          </Button>
         ))}
       </Box>
     </Box>
