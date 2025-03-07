@@ -26,6 +26,9 @@ export type NavigationItem = {
   index: number; // Used for both horizontal navigation and tracking position
 };
 
+// Define the available navigation category types
+type NavType = "topic" | "country" | "search" | "popularSearch";
+
 interface SearchBarProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
@@ -80,6 +83,40 @@ const SearchBar: React.FC<SearchBarProps> = ({
     ...selectedCountries,
     ...nonSelectedFilteredCountries.slice(0, 5),
   ];
+
+  const hasSelectedFilters =
+    selectedTopics.length > 0 || selectedCountries.length > 0;
+
+  const hasFiltersToShow =
+    filteredTopics.length > 0 ||
+    filteredCountries.length > 0 ||
+    hasSelectedFilters;
+
+  const arePopularSearchesVisible =
+    !searchTerm && !hasSelectedFilters && popularSearches.length > 0;
+
+  // Create an array of visible navigation types in order
+  const visibleNavTypes: NavType[] = [];
+  if (displayedTopics.length > 0) visibleNavTypes.push("topic");
+  if (displayedCountries.length > 0) visibleNavTypes.push("country");
+  if (searchTerm) visibleNavTypes.push("search");
+  if (arePopularSearchesVisible) visibleNavTypes.push("popularSearch");
+
+  // Helper function to get max index for a given type
+  const getMaxIndexForType = (type: NavType): number => {
+    switch (type) {
+      case "topic":
+        return displayedTopics.length - 1;
+      case "country":
+        return displayedCountries.length - 1;
+      case "search":
+        return 0; // Only one search button
+      case "popularSearch":
+        return popularSearches.length - 1;
+      default:
+        return -1;
+    }
+  };
 
   // Reset focus when dropdown closes
   useEffect(() => {
@@ -163,173 +200,108 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   };
 
-  // Handle arrow down navigation - simplified to use only parentIndex
+  // Modified arrow down navigation to always go to the next category
   const handleArrowDown = () => {
     if (!focusedItem) {
-      // First focus item depends on what's available
-      if (displayedTopics.length > 0) {
-        setFocusedItem({ type: "topic", index: 0 });
-      } else if (displayedCountries.length > 0) {
-        setFocusedItem({ type: "country", index: 0 });
-      } else if (searchTerm) {
-        setFocusedItem({ type: "search", index: 0 });
-      } else if (arePopularSearchesVisible) {
-        setFocusedItem({ type: "popularSearch", index: 0 });
+      // First focus item in the first visible category
+      if (visibleNavTypes.length > 0) {
+        setFocusedItem({ type: visibleNavTypes[0], index: 0 });
       }
       return;
     }
 
-    // Navigate between categories
-    if (focusedItem.type === "topic") {
-      if (displayedCountries.length > 0) {
-        setFocusedItem({ type: "country", index: 0 });
-      } else if (searchTerm) {
-        setFocusedItem({ type: "search", index: 0 });
-      } else if (arePopularSearchesVisible) {
-        setFocusedItem({ type: "popularSearch", index: 0 });
+    // Find current type index in visible types
+    const currentTypeIndex = visibleNavTypes.indexOf(focusedItem.type);
+
+    if (currentTypeIndex === -1) {
+      // If the current type isn't visible anymore, focus the first item
+      if (visibleNavTypes.length > 0) {
+        setFocusedItem({ type: visibleNavTypes[0], index: 0 });
       }
-    } else if (focusedItem.type === "country") {
-      if (searchTerm) {
-        setFocusedItem({ type: "search", index: 0 });
-      } else if (arePopularSearchesVisible) {
-        setFocusedItem({ type: "popularSearch", index: 0 });
-      }
-    } else if (focusedItem.type === "search") {
-      if (arePopularSearchesVisible) {
-        setFocusedItem({ type: "popularSearch", index: 0 });
-      }
-    } else if (focusedItem.type === "popularSearch") {
-      const nextIndex = focusedItem.index + 1;
-      if (nextIndex < popularSearches.length) {
-        setFocusedItem({ type: "popularSearch", index: nextIndex });
-      } else {
-        // Cycle back to the first item if at the end
-        if (displayedTopics.length > 0) {
-          setFocusedItem({ type: "topic", index: 0 });
-        } else if (displayedCountries.length > 0) {
-          setFocusedItem({ type: "country", index: 0 });
-        } else if (searchTerm) {
-          setFocusedItem({ type: "search", index: 0 });
-        }
-      }
+      return;
     }
+
+    // Always move to the next category when pressing down
+    const nextTypeIndex = (currentTypeIndex + 1) % visibleNavTypes.length;
+    const nextType = visibleNavTypes[nextTypeIndex];
+
+    // Keep the same relative position when moving between categories if possible
+    // Or use position 0 if the next category doesn't have as many items
+    const maxIndexInNextType = getMaxIndexForType(nextType);
+    const nextIndex = Math.min(focusedItem.index, maxIndexInNextType);
+
+    setFocusedItem({
+      type: nextType,
+      index: nextIndex,
+    });
   };
 
-  // Handle arrow up navigation - simplified to use only parentIndex
+  // Modified arrow up navigation to always go to the previous category
   const handleArrowUp = () => {
     if (!focusedItem) {
-      // Focus the last item when pressing up with no focus
-      if (arePopularSearchesVisible) {
-        setFocusedItem({
-          type: "popularSearch",
-          index: popularSearches.length - 1,
-        });
-      } else if (searchTerm) {
-        setFocusedItem({ type: "search", index: 0 });
-      } else if (displayedCountries.length > 0) {
-        setFocusedItem({ type: "country", index: 0 });
-      } else if (displayedTopics.length > 0) {
-        setFocusedItem({ type: "topic", index: 0 });
+      // Start from the last visible type
+      if (visibleNavTypes.length > 0) {
+        const lastType = visibleNavTypes[visibleNavTypes.length - 1];
+        setFocusedItem({ type: lastType, index: 0 });
       }
       return;
     }
 
-    // Navigate between categories in reverse
-    if (focusedItem.type === "popularSearch") {
-      if (focusedItem.index > 0) {
-        setFocusedItem({
-          type: "popularSearch",
-          index: focusedItem.index - 1,
-        });
-      } else if (searchTerm) {
-        setFocusedItem({ type: "search", index: 0 });
-      } else if (displayedCountries.length > 0) {
-        setFocusedItem({ type: "country", index: 0 });
-      } else if (displayedTopics.length > 0) {
-        setFocusedItem({ type: "topic", index: 0 });
+    // Find current type index in visible types
+    const currentTypeIndex = visibleNavTypes.indexOf(focusedItem.type);
+
+    if (currentTypeIndex === -1) {
+      // If the current type isn't visible anymore, focus the first item
+      if (visibleNavTypes.length > 0) {
+        setFocusedItem({ type: visibleNavTypes[0], index: 0 });
       }
-    } else if (focusedItem.type === "search") {
-      if (displayedCountries.length > 0) {
-        setFocusedItem({ type: "country", index: 0 });
-      } else if (displayedTopics.length > 0) {
-        setFocusedItem({ type: "topic", index: 0 });
-      } else {
-        // Cycle to the last popular search only if visible
-        if (arePopularSearchesVisible) {
-          setFocusedItem({
-            type: "popularSearch",
-            index: popularSearches.length - 1,
-          });
-        }
-      }
-    } else if (focusedItem.type === "country") {
-      if (displayedTopics.length > 0) {
-        setFocusedItem({ type: "topic", index: 0 });
-      } else {
-        // Cycle to the last item
-        if (arePopularSearchesVisible) {
-          setFocusedItem({
-            type: "popularSearch",
-            index: popularSearches.length - 1,
-          });
-        } else if (searchTerm) {
-          setFocusedItem({ type: "search", index: 0 });
-        }
-      }
-    } else if (focusedItem.type === "topic") {
-      // Cycle to the last item
-      if (arePopularSearchesVisible) {
-        setFocusedItem({
-          type: "popularSearch",
-          index: popularSearches.length - 1,
-        });
-      } else if (searchTerm) {
-        setFocusedItem({ type: "search", index: 0 });
-      } else if (displayedCountries.length > 0) {
-        setFocusedItem({ type: "country", index: 0 });
-      }
+      return;
     }
+
+    // Always move to the previous category when pressing up
+    const prevTypeIndex =
+      (currentTypeIndex - 1 + visibleNavTypes.length) % visibleNavTypes.length;
+    const prevType = visibleNavTypes[prevTypeIndex];
+
+    // Keep the same relative position when moving between categories if possible
+    // Or use position 0 if the previous category doesn't have as many items
+    const maxIndexInPrevType = getMaxIndexForType(prevType);
+    const prevIndex = Math.min(focusedItem.index, maxIndexInPrevType);
+
+    setFocusedItem({
+      type: prevType,
+      index: prevIndex,
+    });
   };
 
-  // Handle horizontal navigation within a category - simplified to use only parentIndex
+  // Modified horizontal navigation to move within categories
   const handleArrowRight = () => {
     if (!focusedItem) return;
 
-    if (focusedItem.type === "topic") {
-      const nextIndex = focusedItem.index + 1;
-      if (nextIndex < displayedTopics.length) {
-        setFocusedItem({
-          type: "topic",
-          index: nextIndex,
-        });
-      }
-    } else if (focusedItem.type === "country") {
-      const nextIndex = focusedItem.index + 1;
-      if (nextIndex < displayedCountries.length) {
-        setFocusedItem({
-          type: "country",
-          index: nextIndex,
-        });
-      }
+    // Only navigate horizontally within the current category
+    const maxIndex = getMaxIndexForType(focusedItem.type);
+    if (focusedItem.index < maxIndex) {
+      setFocusedItem({
+        type: focusedItem.type,
+        index: focusedItem.index + 1,
+      });
     }
   };
 
-  // Handle horizontal navigation within a category - simplified to use only parentIndex
+  // Modified horizontal navigation to move within categories
   const handleArrowLeft = () => {
     if (!focusedItem) return;
 
-    if (focusedItem.type === "topic" || focusedItem.type === "country") {
-      const prevIndex = focusedItem.index - 1;
-      if (prevIndex >= 0) {
-        setFocusedItem({
-          ...focusedItem,
-          index: prevIndex,
-        });
-      }
+    // Only navigate horizontally within the current category
+    if (focusedItem.index > 0) {
+      setFocusedItem({
+        type: focusedItem.type,
+        index: focusedItem.index - 1,
+      });
     }
   };
 
-  // Handle selection of focused item - simplified to use only parentIndex
+  // Handle selection of focused item
   const handleSelectFocusedItem = () => {
     if (!focusedItem) return;
 
@@ -389,17 +361,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
       refreshResults();
     }
   };
-
-  const hasSelectedFilters =
-    selectedTopics.length > 0 || selectedCountries.length > 0;
-
-  const hasFiltersToShow =
-    filteredTopics.length > 0 ||
-    filteredCountries.length > 0 ||
-    hasSelectedFilters;
-
-  const arePopularSearchesVisible =
-    !searchTerm && !hasSelectedFilters && popularSearches.length > 0;
 
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
