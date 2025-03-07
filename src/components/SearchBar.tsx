@@ -437,7 +437,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                       sx={{
                         justifyContent: "flex-start",
                         textTransform: "none",
-                        py: 1,
+                        py: 0.5,
                         backgroundColor:
                           focusedItem?.type === "search"
                             ? "rgba(0, 0, 0, 0.04)"
@@ -448,6 +448,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
                               ? "rgba(0, 0, 0, 0.08)"
                               : "rgba(0, 0, 0, 0.04)",
                         },
+                        border:
+                          focusedItem?.type === "search"
+                            ? "1px solid #bdbdbd"
+                            : "none",
+                        borderRadius: 1,
                       }}
                     >
                       <Typography>🔎 Search for "{searchTerm}"</Typography>
