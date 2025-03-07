@@ -159,6 +159,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
       if (event.key === "ArrowDown") {
         setDropdownOpen(true);
         event.preventDefault();
+        // Focus the first item in the first category when opening dropdown with arrow down
+        if (visibleNavTypes.length > 0) {
+          setTimeout(() => {
+            setFocusedItem({ type: visibleNavTypes[0], index: 0 });
+          }, 0);
+        }
       }
       return;
     }
