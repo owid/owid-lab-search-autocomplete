@@ -34,8 +34,10 @@ const SelectedFilters: React.FC<SelectedFiltersProps> = ({
             key={topic}
             label={topic}
             onDelete={() => handleTopicToggle(topic)}
+            onClick={() => handleTopicToggle(topic)}
             color="primary"
             size="small"
+            sx={{ cursor: "pointer" }}
           />
         ))}
         {selectedCountries.map((country) => (
@@ -43,8 +45,10 @@ const SelectedFilters: React.FC<SelectedFiltersProps> = ({
             key={country.name}
             label={`${country.flag} ${country.name}`}
             onDelete={() => handleCountryToggle(country)}
+            onClick={() => handleCountryToggle(country)}
             color="primary"
             size="small"
+            sx={{ cursor: "pointer" }}
           />
         ))}
       </Box>
