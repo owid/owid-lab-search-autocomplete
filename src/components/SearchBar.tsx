@@ -495,19 +495,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
                         justifyContent: "flex-start",
                         textTransform: "none",
                         py: 0.5,
-                        backgroundColor:
-                          focusedItem?.type === "search"
-                            ? "rgba(0, 0, 0, 0.04)"
-                            : "transparent",
-                        "&:hover": {
-                          backgroundColor:
-                            focusedItem?.type === "search"
-                              ? "rgba(0, 0, 0, 0.08)"
-                              : "rgba(0, 0, 0, 0.04)",
-                        },
                         border:
                           focusedItem?.type === "search"
-                            ? "1px solid #bdbdbd"
+                            ? "2px solid #ffeb3b"
                             : "none",
                         borderRadius: 1,
                       }}

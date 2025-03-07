@@ -74,8 +74,9 @@ const FilterOptions: React.FC<FilterOptionsProps> = ({
                 sx={{
                   outline:
                     focusedItem?.type === "topic" && focusedItem.index === idx
-                      ? "2px solid #3f51b5"
+                      ? "2px solid #ffeb3b" // Using a yellow color for better contrast against blue
                       : "none",
+                  outlineOffset: "1px", // Adding offset to make outline more visible
                 }}
               />
             ))}
@@ -92,7 +93,7 @@ const FilterOptions: React.FC<FilterOptionsProps> = ({
                   outline:
                     focusedItem?.type === "topic" &&
                     focusedItem.index === idx + selectedTopics.length
-                      ? "2px solid #3f51b5"
+                      ? "2px solid #ffeb3b"
                       : "none",
                 }}
               />
@@ -119,8 +120,9 @@ const FilterOptions: React.FC<FilterOptionsProps> = ({
                 sx={{
                   outline:
                     focusedItem?.type === "country" && focusedItem.index === idx
-                      ? "2px solid #3f51b5"
+                      ? "2px solid #ffeb3b" // Using a yellow color for better contrast against blue
                       : "none",
+                  outlineOffset: "1px", // Adding offset to make outline more visible
                 }}
               />
             ))}
@@ -137,7 +139,7 @@ const FilterOptions: React.FC<FilterOptionsProps> = ({
                   outline:
                     focusedItem?.type === "country" &&
                     focusedItem.index === idx + selectedCountries.length
-                      ? "2px solid #3f51b5"
+                      ? "2px solid #ffeb3b"
                       : "none",
                 }}
               />

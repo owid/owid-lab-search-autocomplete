@@ -28,16 +28,12 @@ const PopularSearches: React.FC<PopularSearchesProps> = ({
               justifyContent: "flex-start",
               textTransform: "none",
               py: 0.5,
-              backgroundColor:
-                focusedIndex === index ? "rgba(0, 0, 0, 0.04)" : "transparent",
-              "&:hover": {
-                backgroundColor:
-                  focusedIndex === index
-                    ? "rgba(0, 0, 0, 0.08)"
-                    : "rgba(0, 0, 0, 0.04)",
-              },
-              border: focusedIndex === index ? "1px solid #bdbdbd" : "none",
+              border:
+                focusedIndex === index
+                  ? "2px solid #ffeb3b"
+                  : "2px solid transparent",
               borderRadius: 1,
+              transition: "border 0s",
             }}
           >
             <Typography variant="body2">{search}</Typography>
