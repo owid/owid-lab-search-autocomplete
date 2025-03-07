@@ -20,8 +20,8 @@ const FilterOptions: React.FC<FilterOptionsProps> = ({
   handleCountryToggle,
   onFilterSelect,
 }) => {
-  const displayTopics = filteredTopics.length > 0;
-  const displayCountries = filteredCountries.length > 0;
+  const hasFilteredTopics = filteredTopics.length > 0;
+  const hasFilteredCountries = filteredCountries.length > 0;
 
   // New wrapper functions to call onFilterSelect after toggling
   const onTopicSelect = (topic: string) => {
@@ -47,7 +47,7 @@ const FilterOptions: React.FC<FilterOptionsProps> = ({
   return (
     <>
       {/* Always show topic filters if there are either selected topics or filtered topics */}
-      {(selectedTopics.length > 0 || displayTopics) && (
+      {(selectedTopics.length > 0 || hasFilteredTopics) && (
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
             Filter by topic
@@ -79,7 +79,7 @@ const FilterOptions: React.FC<FilterOptionsProps> = ({
       )}
 
       {/* Always show country filters if there are either selected countries or filtered countries */}
-      {(selectedCountries.length > 0 || displayCountries) && (
+      {(selectedCountries.length > 0 || hasFilteredCountries) && (
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
             Filter by country

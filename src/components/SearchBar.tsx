@@ -116,11 +116,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   };
 
+  // Add a function to check if any filters are selected
+  const hasSelectedFilters =
+    selectedTopics.length > 0 || selectedCountries.length > 0;
+
   const hasFiltersToShow =
     filteredTopics.length > 0 ||
     filteredCountries.length > 0 ||
-    selectedTopics.length > 0 ||
-    selectedCountries.length > 0;
+    hasSelectedFilters;
 
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
@@ -155,7 +158,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
         {/* Dropdown filter options */}
         {useDropdownFilters &&
           dropdownOpen &&
-          (hasFiltersToShow || popularSearches.length > 0 || searchTerm) && (
+          (hasFiltersToShow ||
+            (!searchTerm && popularSearches.length > 0) ||
+            searchTerm) && (
             <Popper
               open={true}
               anchorEl={searchRef.current}
@@ -203,11 +208,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     </Button>
                   </Box>
                 ) : (
-                  /* Popular searches display when no search term */
-                  <PopularSearches
-                    searches={popularSearches}
-                    onClick={handlePopularSearch}
-                  />
+                  /* Popular searches display when no search term AND no filters selected */
+                  !hasSelectedFilters && (
+                    <PopularSearches
+                      searches={popularSearches}
+                      onClick={handlePopularSearch}
+                    />
+                  )
                 )}
               </Paper>
             </Popper>
