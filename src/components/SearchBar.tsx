@@ -44,6 +44,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -60,12 +61,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   };
 
-  const handleFocus = () => {
+  const onInputFocus = () => {
     setIsFocused(true);
     setDropdownOpen(true);
   };
 
-  const handleBlur = () => {
+  const onInputBlur = () => {
     setIsFocused(false);
     // Close dropdown on blur
     setTimeout(() => {
@@ -105,7 +106,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   // Close dropdown when filter is selected
   const handleFilterSelect = () => {
-    setDropdownOpen(false);
+    setDropdownOpen(() => {
+      // Focus the input after the state is updated to false
+      if (inputRef.current) {
+        inputRef.current?.focus();
+      }
+      return false;
+    });
   };
 
   // Function to handle clicking on the "Search for [term]" button
@@ -136,8 +143,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
             value={searchTerm}
             onChange={handleSearchChange}
             onKeyDown={handleKeyDown}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
+            onFocus={onInputFocus}
+            onBlur={onInputBlur}
             variant="outlined"
             InputProps={{
               startAdornment: (
@@ -145,6 +152,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                   <SearchIcon />
                 </InputAdornment>
               ),
+              inputRef: inputRef, // Add reference to the input element
             }}
             sx={{
               mb: 2,
