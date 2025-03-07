@@ -153,6 +153,7 @@ const SearchApp = () => {
               selectedCountries={selectedCountries}
               handleTopicToggle={handleTopicToggle}
               handleCountryToggle={handleCountryToggle}
+              focusedItem={null}
               // No need to pass onFilterSelect for inline filters
             />
           )}

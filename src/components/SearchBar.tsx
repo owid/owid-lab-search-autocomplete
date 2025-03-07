@@ -206,7 +206,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   };
 
-  // Modified arrow down navigation to always go to the next category
+  // Modified arrow down navigation to navigate within popularSearch category with cycling
   const handleArrowDown = () => {
     if (!focusedItem) {
       // First focus item in the first visible category
@@ -227,7 +227,21 @@ const SearchBar: React.FC<SearchBarProps> = ({
       return;
     }
 
-    // Always move to the next category when pressing down
+    // If we're in popularSearch category, cycle through items
+    if (focusedItem.type === "popularSearch") {
+      const maxIndexInCategory = getMaxIndexForType("popularSearch");
+      // Cycle to the beginning if at the end
+      const nextIndex =
+        focusedItem.index < maxIndexInCategory ? focusedItem.index + 1 : 0;
+
+      setFocusedItem({
+        type: "popularSearch",
+        index: nextIndex,
+      });
+      return;
+    }
+
+    // Otherwise move to the next category when pressing down
     const nextTypeIndex = (currentTypeIndex + 1) % visibleNavTypes.length;
     const nextType = visibleNavTypes[nextTypeIndex];
 
@@ -242,7 +256,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     });
   };
 
-  // Modified arrow up navigation to always go to the previous category
+  // Modified arrow up navigation to navigate within popularSearch category with cycling
   const handleArrowUp = () => {
     if (!focusedItem) {
       // Start from the last visible type
@@ -264,7 +278,21 @@ const SearchBar: React.FC<SearchBarProps> = ({
       return;
     }
 
-    // Always move to the previous category when pressing up
+    // If we're in popularSearch category, cycle through items
+    if (focusedItem.type === "popularSearch") {
+      const maxIndexInCategory = getMaxIndexForType("popularSearch");
+      // Cycle to the end if at the beginning
+      const prevIndex =
+        focusedItem.index > 0 ? focusedItem.index - 1 : maxIndexInCategory;
+
+      setFocusedItem({
+        type: "popularSearch",
+        index: prevIndex,
+      });
+      return;
+    }
+
+    // Otherwise move to the previous category when pressing up
     const prevTypeIndex =
       (currentTypeIndex - 1 + visibleNavTypes.length) % visibleNavTypes.length;
     const prevType = visibleNavTypes[prevTypeIndex];
@@ -280,11 +308,23 @@ const SearchBar: React.FC<SearchBarProps> = ({
     });
   };
 
-  // Modified horizontal navigation to move within categories
+  // Let's also update the left/right navigation to cycle through popular searches
   const handleArrowRight = () => {
     if (!focusedItem) return;
 
-    // Only navigate horizontally within the current category
+    // For popularSearch, enable cycling through items
+    if (focusedItem.type === "popularSearch") {
+      const maxIndex = getMaxIndexForType(focusedItem.type);
+      const nextIndex =
+        focusedItem.index < maxIndex ? focusedItem.index + 1 : 0;
+      setFocusedItem({
+        type: focusedItem.type,
+        index: nextIndex,
+      });
+      return;
+    }
+
+    // For other categories, keep the existing behavior
     const maxIndex = getMaxIndexForType(focusedItem.type);
     if (focusedItem.index < maxIndex) {
       setFocusedItem({
@@ -294,11 +334,22 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   };
 
-  // Modified horizontal navigation to move within categories
   const handleArrowLeft = () => {
     if (!focusedItem) return;
 
-    // Only navigate horizontally within the current category
+    // For popularSearch, enable cycling through items
+    if (focusedItem.type === "popularSearch") {
+      const maxIndex = getMaxIndexForType(focusedItem.type);
+      const prevIndex =
+        focusedItem.index > 0 ? focusedItem.index - 1 : maxIndex;
+      setFocusedItem({
+        type: focusedItem.type,
+        index: prevIndex,
+      });
+      return;
+    }
+
+    // For other categories, keep the existing behavior
     if (focusedItem.index > 0) {
       setFocusedItem({
         type: focusedItem.type,
